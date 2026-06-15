@@ -19,13 +19,13 @@ class SensoresController extends ResourceController
 
     public function show($id = null)
     {
-        $aluno = $this->model->find($id);
+        $sensor = $this->model->find($id);
 
-        if ($aluno === null) {
+        if ($sensor === null) {
             return $this->failNotFound('Sensores nao encontrado');
         }
 
-        return $this->respond($aluno);
+        return $this->respond($sensor);
     }
 
     public function create()

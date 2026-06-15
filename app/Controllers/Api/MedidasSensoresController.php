@@ -19,13 +19,13 @@ class MedidasSensoresController extends ResourceController
 
     public function show($id = null)
     {
-        $aluno = $this->model->find($id);
+        $medida_sensor = $this->model->find($id);
 
-        if ($aluno === null) {
+        if ($medida_sensor === null) {
             return $this->failNotFound('Medidas dos Sensores nao encontradas');
         }
 
-        return $this->respond($aluno);
+        return $this->respond($medida_sensor);
     }
 
     public function create()
