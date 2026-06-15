@@ -10,8 +10,7 @@ class MedidasSensoresModel extends Model
     protected $table = 'MEDIDAS_SENSORES';
     protected $primaryKey = 'MEDIDA_SENSOR_ID';
 
-    // Não é auto incremento
-    protected $useAutoIncrement = false;
+    protected $useAutoIncrement = true;
 
     // Campos permitidos
     protected $allowedFields = [
