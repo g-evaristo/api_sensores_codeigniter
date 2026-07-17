@@ -2,7 +2,11 @@
 
 use CodeIgniter\Router\RouteCollection;
 
-$routes->get('/', 'Home::index');
+$routes->get('/', static function () {
+    return redirect()->to('/swagger');
+});
+
+$routes->get('swagger', 'SwaggerController::index');
 
 // Rotas API Sensores
 $routes->get('/api/sensores',              'Api\SensoresController::index');

@@ -1,0 +1,388 @@
+openapi: 3.0.3
+
+info:
+  title: API Sensores
+  description: API REST para cadastro de sensores e suas respectivas medições.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor local
+
+tags:
+  - name: Sensores
+  - name: Medidas dos Sensores
+
+paths:
+  /sensores:
+    get:
+      tags:
+        - Sensores
+      summary: Lista os sensores
+      parameters:
+        - name: nome
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/StatusSensor'
+      responses:
+        '200':
+          description: Sensores consultados com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaSensoresResponse'
+
+    post:
+      tags:
+        - Sensores
+      summary: Cadastra um sensor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorRequest'
+      responses:
+        '201':
+          description: Sensor cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /sensores/{id}:
+    get:
+      tags:
+        - Sensores
+      summary: Consulta um sensor pelo identificador
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Sensor encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Sensores
+      summary: Atualiza um sensor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorRequest'
+      responses:
+        '200':
+          description: Sensor atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Sensores
+      summary: Exclui um sensor
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Sensor excluído com sucesso
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /medidas_sensores:
+    get:
+      tags:
+        - Medidas dos Sensores
+      summary: Lista as medidas registradas
+      parameters:
+        - name: sensor_id
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: unidade_medida
+          in: query
+          schema:
+            type: string
+        - name: data_inicial
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: data_final
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Medidas consultadas com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListaMedidasSensoresResponse'
+
+    post:
+      tags:
+        - Medidas dos Sensores
+      summary: Registra uma medida de um sensor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedidaSensorRequest'
+      responses:
+        '201':
+          description: Medida cadastrada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedidaSensorResponse'
+        '404':
+          description: Sensor não encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /medidas_sensores/{id}:
+    get:
+      tags:
+        - Medidas dos Sensores
+      summary: Consulta uma medida pelo identificador
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Medida encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedidaSensorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Medidas dos Sensores
+      summary: Atualiza uma medida
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedidaSensorRequest'
+      responses:
+        '200':
+          description: Medida atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedidaSensorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Medidas dos Sensores
+      summary: Exclui uma medida
+      parameters:
+        - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Medida excluída com sucesso
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Identificador do registro
+      schema:
+        type: integer
+        minimum: 1
+
+  responses:
+    NotFound:
+      description: Registro não encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Erro de validação
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    StatusSensor:
+      type: string
+      enum:
+        - ATIVO
+        - INATIVO
+      example: ATIVO
+
+    SensorRequest:
+      type: object
+      required:
+        - sensor_nome
+        - sensor_status
+      properties:
+        sensor_nome:
+          type: string
+          maxLength: 200
+          example: Sensor de temperatura
+        sensor_status:
+          $ref: '#/components/schemas/StatusSensor'
+
+    Sensor:
+      allOf:
+        - type: object
+          properties:
+            sensor_id:
+              type: integer
+              example: 1
+        - $ref: '#/components/schemas/SensorRequest'
+
+    MedidaSensorRequest:
+      type: object
+      required:
+        - medida_sensor_dado
+        - medida_sensor_unidade_medida
+        - medida_sensor_data
+        - fk_sensor_id
+      properties:
+        medida_sensor_dado:
+          type: string
+          maxLength: 200
+          example: '25.5'
+        medida_sensor_unidade_medida:
+          type: string
+          maxLength: 200
+          example: °C
+        medida_sensor_data:
+          type: string
+          format: date-time
+          example: '2026-07-17T13:30:00'
+        fk_sensor_id:
+          type: integer
+          minimum: 1
+          example: 1
+
+    MedidaSensor:
+      allOf:
+        - type: object
+          properties:
+            medida_sensor_id:
+              type: integer
+              example: 1
+        - $ref: '#/components/schemas/MedidaSensorRequest'
+
+    SensorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Sensor consultado com sucesso.
+        data:
+          $ref: '#/components/schemas/Sensor'
+
+    ListaSensoresResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Sensores consultados com sucesso.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Sensor'
+
+    MedidaSensorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Medida consultada com sucesso.
+        data:
+          $ref: '#/components/schemas/MedidaSensor'
+
+    ListaMedidasSensoresResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Medidas consultadas com sucesso.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/MedidaSensor'
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 404
+        message:
+          type: string
+          example: Registro não encontrado.
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 422
+        message:
+          type: string
+          example: Os dados informados são inválidos.
+        errors:
+          type: object
+          additionalProperties:
+            type: string
