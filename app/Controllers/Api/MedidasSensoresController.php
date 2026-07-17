@@ -37,12 +37,11 @@ class MedidasSensoresController extends ResourceController
         }
 
         $dados = array_intersect_key($dados, array_flip([
-            'MEDIDA_SENSOR_DADO','MEDIDA_SENSOR_UNIDADE_MEDIDA','MEDIDA_SENSOR_DATA','FK_SENSOR_ID'
+            'MEDIDA_SENSOR_DADO','MEDIDA_SENSOR_UNIDADE_MEDIDA','FK_SENSOR_ID'
         ]));
 
         if (    empty($dados['MEDIDA_SENSOR_DADO']) 
             ||  empty($dados['MEDIDA_SENSOR_UNIDADE_MEDIDA'])
-            ||  empty($dados['MEDIDA_SENSOR_DATA'])
             ||  empty($dados['FK_SENSOR_ID'])) {
             return $this->failValidationErrors('existem dados obrigatorios não preenchidos!');
         }
